@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora con Gramática Libre de Contexto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #expression {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: right;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .button-grid button {
+            padding: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            transition: background-color 0.2s;
+        }
+
+        .button-grid button:hover {
+            background-color: #0056b3;
+        }
+
+        .button-grid button:active {
+            background-color: #004494;
+        }
+
+        .clear-button {
+            background-color: #ff4d4d;
+        }
+
+        .clear-button:hover {
+            background-color: #cc0000;
+        }
+
+        .submit-button {
+            grid-column: span 2;
+            background-color: #28a745;
+        }
+
+        .submit-button:hover {
+            background-color: #218838;
+        }
+
+        p {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+    <script>
+        // Función para insertar el valor en el campo de entrada
+        function insertValue(value) {
+            const inputField = document.getElementById('expression');
+            inputField.value += value;
+        }
+
+        // Función para limpiar el campo de entrada
+        function clearInput() {
+            document.getElementById('expression').value = '';
+        }
+    </script>
+</head>
+<body>
+    <h1>Calculadora con Gramática Libre de Contexto</h1>
+    <form method="post">
+        <label for="expression">Ingrese una expresión:</label><br>
+        <input type="text" id="expression" name="expression" readonly required>
+        <br>
+        <!-- Botones de la calculadora -->
+        <div class="button-grid">
+            <button type="button" onclick="insertValue('1')">1</button>
+            <button type="button" onclick="insertValue('2')">2</button>
+            <button type="button" onclick="insertValue('3')">3</button>
+            <button type="button" onclick="insertValue('+')">+</button>
+            <button type="button" onclick="insertValue('4')">4</button>
+            <button type="button" onclick="insertValue('5')">5</button>
+            <button type="button" onclick="insertValue('6')">6</button>
+            <button type="button" onclick="insertValue('-')">-</button>
+            <button type="button" onclick="insertValue('7')">7</button>
+            <button type="button" onclick="insertValue('8')">8</button>
+            <button type="button" onclick="insertValue('9')">9</button>
+            <button type="button" onclick="insertValue('*')">*</button>
+            <button type="button" onclick="insertValue('0')">0</button>
+            <button type="button" onclick="insertValue('(')">(</button>
+            <button type="button" onclick="insertValue(')')">)</button>
+            <button type="button" onclick="insertValue('/')">/</button>
+            <button type="button" class="clear-button" onclick="clearInput()">C</button>
+            <button type="submit" class="submit-button">Calcular</button>
+        </div>
+    </form>
+
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+    {% if result is not none %}
+        <h2>Resultado: {{ result }}</h2>
+    {% endif %}
+    {% if steps %}
+        <h3>Pasos de validación:</h3>
+        <ul>
+            {% for step in steps %}
+                <li>{{ step }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if graph_path %}
+        <h3>Árbol de derivación:</h3>
+        <img src="{{ url_for('static', filename='tree_graph.png') }}" alt="Árbol de derivación">
+    {% endif %}
+</body>
+</html>
