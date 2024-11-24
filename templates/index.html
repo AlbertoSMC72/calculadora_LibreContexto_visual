@@ -4,31 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora con Gramática Libre de Contexto</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             margin: 0;
             padding: 20px;
             background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        h1 {
-            color: #333;
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
         }
 
-        form {
+        .calculator {
             background: #ffffff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            display: inline-block;
         }
 
         #expression {
@@ -83,70 +86,138 @@
             background-color: #218838;
         }
 
-        p {
+        .backspace-button {
+            background-color: #ffc107;
+        }
+
+        .backspace-button:hover {
+            background-color: #e0a800;
+        }
+
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .card h2, .card h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+
+        .card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .card ul li {
+            margin: 5px 0;
+            padding: 5px 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .card img {
+            max-width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        p.error {
             color: red;
             font-size: 14px;
         }
     </style>
     <script>
-        // Función para insertar el valor en el campo de entrada
         function insertValue(value) {
             const inputField = document.getElementById('expression');
             inputField.value += value;
         }
 
-        // Función para limpiar el campo de entrada
+        function backspace() {
+            const inputField = document.getElementById('expression');
+            inputField.value = inputField.value.slice(0, -1);
+        }
+
         function clearInput() {
             document.getElementById('expression').value = '';
         }
     </script>
 </head>
 <body>
-    <h1>Calculadora con Gramática Libre de Contexto</h1>
-    <form method="post">
-        <label for="expression">Ingrese una expresión:</label><br>
-        <input type="text" id="expression" name="expression" readonly required>
-        <br>
-        <!-- Botones de la calculadora -->
-        <div class="button-grid">
-            <button type="button" onclick="insertValue('1')">1</button>
-            <button type="button" onclick="insertValue('2')">2</button>
-            <button type="button" onclick="insertValue('3')">3</button>
-            <button type="button" onclick="insertValue('+')">+</button>
-            <button type="button" onclick="insertValue('4')">4</button>
-            <button type="button" onclick="insertValue('5')">5</button>
-            <button type="button" onclick="insertValue('6')">6</button>
-            <button type="button" onclick="insertValue('-')">-</button>
-            <button type="button" onclick="insertValue('7')">7</button>
-            <button type="button" onclick="insertValue('8')">8</button>
-            <button type="button" onclick="insertValue('9')">9</button>
-            <button type="button" onclick="insertValue('*')">*</button>
-            <button type="button" onclick="insertValue('0')">0</button>
-            <button type="button" onclick="insertValue('(')">(</button>
-            <button type="button" onclick="insertValue(')')">)</button>
-            <button type="button" onclick="insertValue('/')">/</button>
-            <button type="button" class="clear-button" onclick="clearInput()">C</button>
-            <button type="submit" class="submit-button">Calcular</button>
+    <div class="container">
+        <!-- Columna de la Calculadora -->
+        <div class="calculator">
+            <form method="post">
+                <input type="text" id="expression" name="expression" readonly required>
+                <div class="button-grid">
+                    <button type="button" onclick="insertValue('1')">1</button>
+                    <button type="button" onclick="insertValue('2')">2</button>
+                    <button type="button" onclick="insertValue('3')">3</button>
+                    <button type="button" onclick="insertValue('+')">+</button>
+                    <button type="button" onclick="insertValue('4')">4</button>
+                    <button type="button" onclick="insertValue('5')">5</button>
+                    <button type="button" onclick="insertValue('6')">6</button>
+                    <button type="button" onclick="insertValue('-')">-</button>
+                    <button type="button" onclick="insertValue('7')">7</button>
+                    <button type="button" onclick="insertValue('8')">8</button>
+                    <button type="button" onclick="insertValue('9')">9</button>
+                    <button type="button" onclick="insertValue('*')">*</button>
+                    <button type="button" onclick="insertValue('0')">0</button>
+                    <button type="button" onclick="insertValue('(')">(</button>
+                    <button type="button" onclick="insertValue(')')">)</button>
+                    <button type="button" onclick="insertValue('/')">/</button>
+                    <button type="button" class="backspace-button" onclick="backspace()">←</button>
+                    <button type="button" class="clear-button" onclick="clearInput()">C</button>
+                    <button type="submit" class="submit-button">Calcular</button>
+                </div>
+            </form>
         </div>
-    </form>
 
-    {% if error %}
-        <p>{{ error }}</p>
-    {% endif %}
-    {% if result is not none %}
-        <h2>Resultado: {{ result }}</h2>
-    {% endif %}
-    {% if steps %}
-        <h3>Pasos de validación:</h3>
-        <ul>
-            {% for step in steps %}
-                <li>{{ step }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% if graph_path %}
-        <h3>Árbol de derivación:</h3>
-        <img src="{{ url_for('static', filename='tree_graph.png') }}" alt="Árbol de derivación">
-    {% endif %}
+        <!-- Columna de Resultados -->
+        <div class="results">
+            {% if error %}
+                <div class="card">
+                    <p class="error">{{ error }}</p>
+                </div>
+            {% endif %}
+
+            {% if result is not none %}
+                <div class="card">
+                    <h2>Resultado: {{ result }}</h2>
+                </div>
+                <div class="card">
+                    <h3>Tokens Extraídos:</h3>
+                    <ul>
+                        {% for token in tokens %}
+                            <li>{{ token }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Detalles de los Tokens:</h3>
+                    <ul>
+                        <li>Total de Números: {{ total_numbers }}</li>
+                        <li>Total de Operadores: {{ total_operators }}</li>
+                    </ul>
+                </div>
+            {% endif %}
+
+            {% if graph_path %}
+                <div class="card">
+                    <h3>Árbol de Derivación:</h3>
+                    <img src="{{ url_for('static', filename='tree_graph.png') }}" alt="Árbol de derivación">
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </body>
 </html>

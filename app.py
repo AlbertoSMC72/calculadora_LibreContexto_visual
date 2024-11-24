@@ -1,31 +1,42 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file
-from validator import validate_expression, evaluate_expression
-from graph_generator import generate_tree_graph
+from flask import Flask, render_template, request
+import re
 import os
+from graph_generator import generate_tree_graph
 
 app = Flask(__name__)
+results_history = []
+
+# Función para analizar los tokens
+def analyze_tokens(expression):
+    tokens = re.findall(r'[0-9]+|[\+\-\*/\(\)]', expression)
+    total_numbers = len([t for t in tokens if t.isdigit()])
+    total_operators = len([t for t in tokens if t in '+-*/'])
+    return tokens, total_numbers, total_operators
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     result = None
-    validation_steps = []
-    graph_path = None
     error = None
+    tokens = []
+    total_numbers = 0
+    total_operators = 0
+    graph_path = None
 
     if request.method == 'POST':
         expression = request.form['expression']
-        is_valid, validation_steps = validate_expression(expression)
-        
-        if is_valid:
-            try:
-                result = evaluate_expression(expression)
-                graph_path = generate_tree_graph(expression)
-            except Exception as e:
-                error = f"Error al calcular la expresión: {str(e)}"
-        else:
-            error = "La expresión ingresada no es válida."
+        try:
+            # Validación básica
+            tokens, total_numbers, total_operators = analyze_tokens(expression)
+            result = eval(expression)  # Evaluar la expresión
+            results_history.append(result)  # Guardar el resultado
 
-    return render_template('index.html', result=result, steps=validation_steps, graph_path=graph_path, error=error)
+            # Generar el gráfico del árbol
+            graph_path = generate_tree_graph(expression)
+        except Exception as e:
+            error = f"Error al procesar la expresión: {str(e)}"
+
+    return render_template('index.html', result=result, error=error, tokens=tokens,
+                           total_numbers=total_numbers, total_operators=total_operators, graph_path=graph_path)
 
 if __name__ == '__main__':
     app.run(debug=True)
