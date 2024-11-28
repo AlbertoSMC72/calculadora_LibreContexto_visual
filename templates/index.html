@@ -137,6 +137,8 @@
         }
     </style>
     <script>
+        let memory = ""; // Variable para guardar el valor en memoria
+
         function insertValue(value) {
             const inputField = document.getElementById('expression');
             inputField.value += value;
@@ -149,6 +151,16 @@
 
         function clearInput() {
             document.getElementById('expression').value = '';
+        }
+
+        function saveToMemory(a) {
+            memory = a; // Guarda el valor en memoria
+            // alert("Valor guardado en memoria: " + memory);
+        }
+
+        function recallMemory() {
+            const inputField = document.getElementById('expression');
+            inputField.value += `(${memory})`;
         }
     </script>
 </head>
@@ -177,6 +189,8 @@
                     <button type="button" onclick="insertValue('/')">/</button>
                     <button type="button" class="backspace-button" onclick="backspace()">←</button>
                     <button type="button" class="clear-button" onclick="clearInput()">C</button>
+                    <button type="button" onclick="saveToMemory('{{ result }}')">MS</button>
+                    <button type="button" onclick="recallMemory()">MR</button>
                     <button type="submit" class="submit-button">Calcular</button>
                 </div>
             </form>
